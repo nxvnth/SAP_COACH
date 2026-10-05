@@ -1,0 +1,8 @@
+{
+  "provider": "aicredits",
+  "base_url": "https://api.aicredits.in/v1",
+  "model": "openai/gpt-5.6-luna",
+  "budget_usd": 0.5,
+  "max_calls": 40,
+  "max_output_tokens": 3000
+}

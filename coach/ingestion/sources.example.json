@@ -1,0 +1,16 @@
+[
+  {
+    "key": "adm328-v23",
+    "file": "ADM328_EN_Col23.pdf",
+    "profile": "tadm",
+    "start": 41,
+    "end": 52
+  },
+  {
+    "key": "hana-sps08",
+    "file": "SAP_HANA_Administration_Guide_en.pdf",
+    "profile": "hana",
+    "start": 45,
+    "end": 61
+  }
+]

@@ -1,0 +1,97 @@
+{
+  "status": "insufficient",
+  "blocks": [
+    {
+      "text": "If by \u201cgenerate it\u201d you mean obtaining the Stack XML, the supplied evidence says to download the Stack XML needed for the Software Update Manager (SUM), push the selected software packages to the Download Basket, and download them with the Download Manager. It does not specify the subsequent SUM steps, such as exactly where to place the files or which SUM screen to use.",
+      "source_ids": [
+        "adm328-v23:paragraph:d329db03342b"
+      ]
+    },
+    {
+      "text": "The evidence also says that, starting with SUM 2.0 SP 10, only a kernel for the target database needs to be selected; an up-to-date SAP Host Agent and SUM can also be selected. However, it does not establish whether those selections apply to your particular update.",
+      "source_ids": [
+        "adm328-v23:paragraph:b5c60a7e4118"
+      ]
+    }
+  ],
+  "diagram": {
+    "title": "What happens after selecting the software",
+    "nodes": [
+      {
+        "id": "stack_xml",
+        "label": "Stack XML",
+        "explanation": "The Stack XML needed for SUM is downloaded.",
+        "source_ids": [
+          "adm328-v23:paragraph:d329db03342b"
+        ],
+        "explanatory": false
+      },
+      {
+        "id": "selected_packages",
+        "label": "Selected software packages",
+        "explanation": "Software packages selected for download.",
+        "source_ids": [
+          "adm328-v23:paragraph:d329db03342b"
+        ],
+        "explanatory": false
+      },
+      {
+        "id": "download_basket",
+        "label": "Download Basket",
+        "explanation": "The selected software packages are pushed here before downloading.",
+        "source_ids": [
+          "adm328-v23:paragraph:d329db03342b"
+        ],
+        "explanatory": false
+      },
+      {
+        "id": "download_manager",
+        "label": "Download Manager",
+        "explanation": "The selected software packages are downloaded with this tool.",
+        "source_ids": [
+          "adm328-v23:paragraph:d329db03342b"
+        ],
+        "explanatory": false
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "label": "is downloaded",
+        "explanation": "The Stack XML needed for SUM is downloaded.",
+        "source_ids": [
+          "adm328-v23:paragraph:d329db03342b"
+        ],
+        "explanatory": false,
+        "source": "stack_xml",
+        "target": "download_manager"
+      },
+      {
+        "id": "e2",
+        "label": "pushed to",
+        "explanation": "Selected software packages are pushed to the Download Basket.",
+        "source_ids": [
+          "adm328-v23:paragraph:d329db03342b"
+        ],
+        "explanatory": false,
+        "source": "selected_packages",
+        "target": "download_basket"
+      },
+      {
+        "id": "e3",
+        "label": "downloaded with",
+        "explanation": "The packages in the Download Basket are downloaded with the Download Manager.",
+        "source_ids": [
+          "adm328-v23:paragraph:d329db03342b"
+        ],
+        "explanatory": false,
+        "source": "download_basket",
+        "target": "download_manager"
+      }
+    ]
+  },
+  "followups": [
+    "Do you mean generating the Stack XML, or generating something inside SUM?",
+    "Which SAP product and SUM version are you updating?"
+  ]
+}

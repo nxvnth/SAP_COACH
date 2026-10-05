@@ -1,0 +1,106 @@
+{
+  "status": "partial",
+  "blocks": [
+    {
+      "text": "In the supplied SAP S/4HANA conversion context, add-ons are existing extensions or components in an SAP ERP system that must be checked before conversion. SAP requires their compatibility with SAP S/4HANA to be validated before the conversion can begin. Business functions are assessed in the same way, but they are mentioned as a separate category from add-ons.",
+      "source_ids": [
+        "adm328-v23:paragraph:0708699d7220",
+        "adm328-v23:paragraph:83f3b4677eaa"
+      ]
+    },
+    {
+      "text": "A key preparation task is to view both the number of existing add-ons and their compatibility status. This helps identify whether the current system contains add-ons that may affect the planned conversion.",
+      "source_ids": [
+        "adm328-v23:paragraph:64892206ea89"
+      ]
+    },
+    {
+      "text": "The available material does not identify specific add-on products, explain installation or removal procedures, or describe certification and maintenance rules. Therefore, those details cannot be stated reliably here.",
+      "source_ids": []
+    }
+  ],
+  "diagram": {
+    "title": "Add-on compatibility before SAP S/4HANA conversion",
+    "nodes": [
+      {
+        "id": "erp",
+        "label": "Existing SAP ERP system",
+        "explanation": "The starting system may contain existing add-ons and business functions.",
+        "source_ids": [
+          "adm328-v23:paragraph:0708699d7220",
+          "adm328-v23:paragraph:64892206ea89"
+        ],
+        "explanatory": false
+      },
+      {
+        "id": "addons",
+        "label": "Existing add-ons",
+        "explanation": "Add-ons are assessed as existing components in the ERP system.",
+        "source_ids": [
+          "adm328-v23:paragraph:0708699d7220",
+          "adm328-v23:paragraph:64892206ea89"
+        ],
+        "explanatory": false
+      },
+      {
+        "id": "check",
+        "label": "Compatibility validation",
+        "explanation": "Compatibility must be validated before the conversion can start.",
+        "source_ids": [
+          "adm328-v23:paragraph:0708699d7220"
+        ],
+        "explanatory": false
+      },
+      {
+        "id": "s4hana",
+        "label": "SAP S/4HANA conversion",
+        "explanation": "The conversion is the target activity described by the source.",
+        "source_ids": [
+          "adm328-v23:paragraph:0708699d7220"
+        ],
+        "explanatory": false
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "label": "contains",
+        "explanation": "An existing SAP ERP system can have existing add-ons.",
+        "source_ids": [
+          "adm328-v23:paragraph:64892206ea89"
+        ],
+        "explanatory": false,
+        "source": "erp",
+        "target": "addons"
+      },
+      {
+        "id": "e2",
+        "label": "must pass before",
+        "explanation": "Add-on compatibility must be validated before the system conversion can begin.",
+        "source_ids": [
+          "adm328-v23:paragraph:0708699d7220"
+        ],
+        "explanatory": false,
+        "source": "addons",
+        "target": "check"
+      },
+      {
+        "id": "e3",
+        "label": "enables preparation for",
+        "explanation": "The compatibility check is a prerequisite in the described conversion preparation.",
+        "source_ids": [
+          "adm328-v23:paragraph:0708699d7220"
+        ],
+        "explanatory": false,
+        "source": "check",
+        "target": "s4hana"
+      }
+    ]
+  },
+  "followups": [
+    "Explain how add-on compatibility affects an SAP ERP to SAP S/4HANA conversion",
+    "Explain the difference between add-ons and business functions",
+    "What should be checked for existing add-ons before a system conversion?"
+  ],
+  "clarification": null
+}
