@@ -1,5 +1,15 @@
 """NVIDIA hosted text reranking. No implicit retries; durable attempted-call ledger."""
 
+# READER GUIDE
+# Hosted NVIDIA relevance scoring, separate from answer generation.
+# The request contains a question and an ordered list of text passages. The API
+# returns positions and scores; positions must be mapped back to that same list.
+# A logit is a ranking signal, not a probability that a passage is correct.
+# rankings() checks that the response covers every submitted position exactly
+# once and contains finite scores. Cache hits reuse the original API latency
+# stored in the response; that value is not the elapsed time of the cache read.
+# This client's attempt cap is separate from the AIcredits dollar reservation cap.
+
 import hashlib, json, math, os, ssl, time, urllib.request
 from pathlib import Path
 

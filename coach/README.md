@@ -2,6 +2,31 @@
 
 The chatbot owns its retrieval and ingestion code. It does not import or read `e01`, the parent `output`, `docs`, or `tmp` directories. The Python virtual environment and API credentials live at the project root, as requested.
 
+## Reading the code for the first time
+
+Each main Python module now starts with a `READER GUIDE`: its responsibility, input/output flow, and boundaries. Inline comments explain decisions and include examples where the logic is less obvious.
+
+Follow one learner question through these files:
+
+1. **`server.py` → `graph.py`**: HTTP request, conversation lookup, intent routing and saving a completed turn.
+2. **`service.py` → `prompts.py` → `contracts.py`**: what each model call receives, what it should return, and what the app accepts or omits.
+3. **`retrieval/retriever.py` → `hybrid.py` → `vector.py` / `reranker.py`**: candidate search, ranking and assembling cited evidence. Start with the retriever before the scoring mathematics.
+4. **`provider.py`**: exact-request caching, reservations, network submission and errors. Read this when tracing cost or provider failures.
+5. **`web/src/main.jsx`**: how the returned turn becomes chat text, page citations and a selectable diagram.
+
+Then follow the separate data preparation path: `ingest.py` → `ingestion/pipeline.py` → `extractor.py` / `procedures.py` → `chunking.py` → `retrieval/index_store.py`. Ingestion builds files; chat retrieval reads them.
+
+Four terms help connect the layers:
+
+| Term | Meaning |
+|---|---|
+| Canonical object | A source content unit with a stable ID and PDF location. |
+| Window | A token-limited slice used for embedding; several can belong to one object. |
+| Anchor | A ranked object selected as a starting point for evidence assembly. |
+| Evidence | Original source text sent to the answer model, with IDs used for citations. |
+
+For concrete failure examples, read the fixture tests in `test_coach.py`. Run `check.py` for offline checks; `smoke.py` and `quality_check.py` can make paid API calls.
+
 ## Run from coach
 
 ```sh
@@ -68,6 +93,38 @@ coach/data/documents/SAP_HANA_Administration_Guide_en.pdf
 ```
 
 The PDFs, extracted text, and generated indexes are intentionally excluded from Git. Do not commit or redistribute them unless you have permission. The embedding model weights are stored with Git LFS; install Git LFS before cloning so the weights are downloaded.
+
+## First-time setup, in order
+
+Run these commands from a terminal. Git LFS must be installed on your computer before cloning; `git lfs install` configures it for your account:
+
+```sh
+git lfs install
+git clone https://github.com/nxvnth/SAP_COACH.git
+cd SAP_COACH
+python3.11 -m venv .venv
+.venv/bin/python -m pip install -r coach/runtime-lock.txt
+```
+
+Next, obtain authorized copies of the two PDFs named above and put them in `coach/data/documents/`. The filenames must match `ingestion/sources.example.json` exactly. Copy `.env.example` to `.env` at the project root and replace the placeholders with your API keys; the keys are needed to run chat, but not to extract PDFs or build the local index.
+
+Then, from the repository root, run the extraction and index-building commands in order:
+
+```sh
+cd coach
+../.venv/bin/python ingest.py extract \
+  --sources ingestion/sources.example.json \
+  --output data/candidates/local
+../.venv/bin/python ingest.py build --dataset data/candidates/local
+```
+
+Finally, still from `coach`, start the app using the index you just built:
+
+```sh
+SAP_COACH_INDEX="$PWD/data/candidates/local" ../.venv/bin/python run.py
+```
+
+Open http://127.0.0.1:8000. Index creation uses the included local embedding model and does not require a model-hub download. Keep the generated `data/candidates/local` directory on your machine; it is ignored by Git and must be rebuilt when setting up another checkout.
 
 ## Retrieval replacement boundary
 

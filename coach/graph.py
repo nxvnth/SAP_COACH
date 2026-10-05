@@ -4,6 +4,18 @@ START -> understand -> retrieve -> generate -> validate -> commit -> END
 Only commit adds a completed turn. Failed generations never become chat history.
 """
 
+# READER GUIDE
+# Conversation workflow, not the SAP domain knowledge graph.
+# Each node reads a state dictionary and returns a dictionary of updated fields.
+# The normal route is understand -> retrieve -> generate -> validate -> commit.
+# An ambiguous question follows understand -> clarify -> commit instead.
+# turns is the completed conversation; history is only the bounded prompt window.
+# raw_answer is untrusted model output; answer is the validated display payload.
+# The checkpointer can retain intermediate state after an error, but only commit
+# adds to turns. The server/UI reads turns, not every checkpoint field.
+# Example: "What does Maintenance Planner do?" starts a topic; "What does it
+# produce?" needs the intent node to resolve "it" before searching.
+
 import uuid
 from typing import TypedDict
 from langgraph.checkpoint.memory import InMemorySaver
@@ -13,6 +25,8 @@ from .settings import HISTORY_CHARACTER_LIMIT, HISTORY_MESSAGE_LIMIT
 
 # State fields are the shared worksheet for graph nodes. Each node returns only the fields it changes.
 class ChatState(TypedDict, total=False):
+    # Per-request inputs/results follow below. total=False allows fields to be
+    # absent before their node runs; it does not mean a node can use any missing key.
     intent: dict
     turns: list[dict]
     message: str
@@ -96,6 +110,8 @@ class ConversationGraph:
         return state.values.get("turns", [])
 
     def invoke(self, thread_id, message, selection=None, want_diagram=False):
+        # Check existence before invoking, so an unknown ID does not implicitly
+        # create a conversation. Server routes translate this KeyError into HTTP 404.
         self.turns(thread_id)
         state = self.graph.invoke(
             {"message": message, "selection": selection, "want_diagram": want_diagram},
@@ -155,4 +171,6 @@ class ConversationGraph:
             "question": state["message"],
             "answer": state["answer"],
         }
+        # No append reducer is configured for turns, so return the complete new
+        # list. Returning only [turn] here would replace the visible conversation.
         return {"turns": state.get("turns", []) + [turn], "last_turn": turn}

@@ -1,5 +1,12 @@
 """Bounded live check through the LangGraph pipeline, using the standalone app."""
 
+# READER GUIDE
+# Live integration check: this script can spend API credits.
+# It starts a short conversation and follows up using a selected diagram node
+# when available. A separate state directory isolates the check's cache/ledger
+# from normal chats. The assertions check successful workflow completion, not
+# whether an SAP expert would endorse every generated claim.
+
 import json
 from .graph import ConversationGraph
 from .service import TeachingService

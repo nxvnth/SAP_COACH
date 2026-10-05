@@ -1,5 +1,13 @@
 """Offline regressions for output validation, thread memory and standalone runtime."""
 
+# READER GUIDE
+# Regression map for new maintainers.
+# FakeService avoids live model calls while testing graph state and HTTP behavior.
+# Fixture tests replay previously troublesome model output through validation.
+# Retrieval-adapter tests mock ranking output and inspect which anchors are used.
+# An accepted citation ID is tested as a structural property, not proof that the
+# passage entails the answer. Add a regression here when fixing another failure.
+
 import copy
 import json
 import tempfile

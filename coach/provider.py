@@ -1,5 +1,16 @@
 """Small paid API client with durable reservations, caching, and no secret logging."""
 
+# READER GUIDE
+# AIcredits transport and local spending control; no retrieval happens here.
+# call() builds JSON -> checks exact-request cache -> reserves budget -> sends
+# one request -> parses/checks output -> saves a reusable response.
+# The cache key includes the prompt, schema, model and input, so a prompt edit
+# can cause a new paid request even when the learner's question is unchanged.
+# Reservations are conservative local accounting, not the provider wallet balance.
+# A timeout may still have been billed, so an attempted request without a valid
+# cache is blocked from automatic replay. The local server serializes chat calls;
+# this file does not implement a multi-process transactional billing database.
+
 import hashlib, json, math, os, ssl, time, urllib.request, urllib.error, urllib.parse
 from pathlib import Path
 from .settings import ENV_FILE
@@ -136,6 +147,9 @@ class Client:
         # Hash the full payload: changing the model, prompt, question or schema creates a different cache entry.
         key = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
         cached = self.cache / (key + ".json")
+        # A cached provider result still goes through service/contract validation.
+        # Caching successful JSON does not imply that the learner-facing answer
+        # has already passed source checks or been committed to a conversation.
         if cached.exists():
             return read(cached)["parsed"]
         # An unresolved attempt is never silently charged again.

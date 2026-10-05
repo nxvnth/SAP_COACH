@@ -1,5 +1,14 @@
 """Versioned data contract between offline ingestion and online retrieval."""
 
+# READER GUIDE
+# The file-level handoff between ingestion and online search.
+# An index consists of inventory.json (objects), manifest.json (source editions),
+# passages.json (embedding windows/spans), and vectors.npy (one vector per window).
+# index_manifest.json records their hashes plus the embedding configuration.
+# Moving identical model files is allowed; changing model identity requires a
+# rebuild. Hash checks detect changed artifacts, not incorrect extraction or
+# unsupported claims. Human review and quality evaluation remain separate.
+
 import hashlib
 import json
 from pathlib import Path

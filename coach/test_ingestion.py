@@ -1,5 +1,12 @@
 """Offline checks for the ingestion/retrieval handoff and overwrite protection."""
 
+# READER GUIDE
+# Tests for dataset boundaries rather than PDF extraction accuracy.
+# Temporary files let these tests check tampering, model-identity mismatch,
+# forbidden overwrites and source paths escaping the document directory.
+# They do not exercise all layouts in the real SAP PDFs; source-specific
+# extraction changes also need review of representative documents and tables.
+
 import json
 import tempfile
 import unittest

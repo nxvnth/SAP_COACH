@@ -1,5 +1,15 @@
 """All application paths are relative to this directory, not the parent project."""
 
+# READER GUIDE
+# Central path/configuration rules shared by backend and ingestion.
+# APP_DIR is coach; PROJECT_DIR is its parent. Code/assets live under coach,
+# while credentials are read from the project-root .env or process environment.
+# SAP_COACH_INDEX selects an alternative dataset; SAP_COACH_STATE selects an
+# alternative cache/ledger directory. Relative override paths use the process's
+# working directory, so absolute paths are clearer for deployment.
+# MODEL_CONFIG is loaded once at import. Editing config.json does not update an
+# already-running process: restart it to apply new model or budget settings.
+
 import json
 import os
 from pathlib import Path

@@ -1,5 +1,16 @@
 """Retrieve evidence, generate an answer, and validate it: LangGraph calls these steps."""
 
+# READER GUIDE
+# Application operations called by the workflow nodes.
+# TeachingService coordinates three separate concerns: query understanding,
+# source retrieval, and answer generation/validation. The same answer-model
+# client is used for intent and teaching, but each has a different prompt/schema.
+# The retriever returns original passages; the generator turns those passages
+# into an explanation and optional diagram; contracts.py checks the result.
+# Constructor injection lets tests supply fake providers/retrievers. To promote
+# a new retrieval experiment, preserve the retrieve() return contract instead
+# of changing the server or the conversation graph.
+
 import json
 import uuid
 from .contracts import Answer, QueryIntent, normalize_answer, validate_intent

@@ -1,5 +1,15 @@
 """HTTP routes for the local learning app. Conversation state lives in LangGraph."""
 
+# READER GUIDE
+# HTTP boundary: start here when tracing a browser request.
+# POST /api/sessions creates a conversation; POST /api/sessions/{id}/chat
+# resolves a diagram selection and invokes ConversationGraph. The graph returns
+# one completed turn containing both the learner's question and the answer.
+# This module owns HTTP status codes, concurrency control, PDF routes and serving
+# the React build. It does not decide which SAP passages are relevant.
+# For the next layer, read graph.py, then service.py. A 502 from this server can
+# mean local answer validation failed, not necessarily that the provider was down.
+
 import json
 import logging
 import threading

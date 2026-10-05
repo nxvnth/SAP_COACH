@@ -1,5 +1,11 @@
 """Run with `python run.py` from inside coach/, or `python coach/run.py`."""
 
+# READER GUIDE
+# Local application entry point: from coach run ../.venv/bin/python run.py.
+# The import-path adjustment exposes the coach package; it does not import
+# experiments. Importing server creates routes/services; uvicorn serves them.
+# Retrieval model loading is deferred until a question actually needs it.
+
 import sys
 from pathlib import Path
 import uvicorn

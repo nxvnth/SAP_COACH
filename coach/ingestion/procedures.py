@@ -1,5 +1,15 @@
 """Normalize repeated procedural numbering without inventing steps."""
 
+# READER GUIDE
+# Repair grouping of numbered steps after layout extraction.
+# The PDFs may restart numbering within one extracted section. A lower/repeated
+# number can therefore mark a new procedure rather than a continuation.
+# For the supported HANA edition, extra indentation can instead identify a
+# substep; those source objects are attached to the preceding step.
+# Splits retain original evidence references and get review-required titles.
+# This function mutates the Extractor inventory/issues in memory. It neither
+# rewrites the PDF nor generates new technical instructions with an LLM.
+
 from . import extractor as x
 
 

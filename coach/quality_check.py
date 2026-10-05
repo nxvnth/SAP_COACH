@@ -1,5 +1,14 @@
 """Small paid regression replay. Reuses a fixed cache and a six-call/$0.08 cap."""
 
+# READER GUIDE
+# Targeted paid replay of the topic-contamination regression.
+# The sequence moves from Stack XML to Maintenance Planner, then asks about
+# "its" role in upgrades. Assertions check that the new topic is independent
+# and the follow-up resolves to the recent subject.
+# The fixed test ledger is intentionally reused across runs. --resume-followup
+# uses saved first turns to avoid regenerating them; it is a diagnostic replay,
+# not the normal user-facing conversation-resume feature.
+
 import json
 import sys
 from .contracts import normalize_answer

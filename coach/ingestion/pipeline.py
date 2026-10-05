@@ -1,5 +1,16 @@
 """Build reviewable candidate datasets. Never overwrite the active chat index."""
 
+# READER GUIDE
+# Offline orchestration: build a candidate, never mutate the live corpus.
+# extract() takes source range dictionaries and writes objects, raw lines,
+# source metadata, issues, validation results and an HTML review page.
+# build_index() requires successful structural validation, makes passage windows,
+# embeds them, and writes the index manifest last. It is a separate CLI operation
+# so a person can inspect extraction before indexing.
+# This is replacement-corpus construction, not incremental merging into the
+# active index. A valid candidate becomes active only through explicit dataset
+# selection and a server restart; neither function changes chat configuration.
+
 import json
 from pathlib import Path
 import numpy as np

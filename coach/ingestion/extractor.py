@@ -2,6 +2,19 @@
 Profiles are provisional and intentionally scoped to the supplied PDF editions.
 """
 
+# READER GUIDE
+# Document-layout parsing for the supplied TADM and HANA editions.
+# PDF text does not arrive as semantic paragraphs/tables. lines_on() retains
+# font and bounding-box information; profile rules use that geometry to group
+# text, locate headings, infer tables and preserve figures as image crops.
+# Extractor.process() builds the section hierarchy before assigning content
+# objects, then links procedure/assessment/figure context. Object IDs derive
+# from source position; raw_line_ids make coverage and provenance auditable.
+# A bbox is [left, top, right, bottom] in PDF page coordinates. Page inputs are
+# one-based, while the PDF library is indexed from zero. Rules and printed-page
+# mappings are edition-specific; this is not a general OCR or image-understanding
+# pipeline. Extraction issues flag uncertainty rather than silently inventing text.
+
 from __future__ import annotations
 import argparse, collections, hashlib, html, json, re
 from pathlib import Path

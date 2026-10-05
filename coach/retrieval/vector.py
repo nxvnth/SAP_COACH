@@ -1,5 +1,15 @@
 """Local embeddings, evidence units and token-bounded passage windows."""
 
+# READER GUIDE
+# Shared embedding and evidence primitives.
+# units() renders objects as source-bearing text: procedures refer to child
+# objects, and table rows carry their column headings so isolated values make sense.
+# ancestors() walks document sections to supply location/context breadcrumbs.
+# load_model() uses bundled local BGE weights; rank() embeds only the query and
+# compares it with precomputed passage vectors. Documents are not re-embedded
+# for each chat turn. evidence_covered() merges token spans to distinguish full
+# coverage from a matching fragment; similarity alone does not establish coverage.
+
 from __future__ import annotations
 import hashlib, json, os, time
 from pathlib import Path

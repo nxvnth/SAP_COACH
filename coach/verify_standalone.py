@@ -1,5 +1,13 @@
 """Offline packaging check: copy the app alone, then load UI, PDF and retrieval."""
 
+# READER GUIDE
+# Offline deployment-boundary check.
+# Copy coach to a temporary location, excluding secrets, caches and node_modules,
+# then start a child Python process using the current environment. That process
+# checks UI/PDF/API routes, local search and imported module locations.
+# This proves that the app-owned package/assets work without the experiment
+# folder. It does not prove durable sessions, multi-user capacity or visual UI quality.
+
 import shutil
 import subprocess
 import sys

@@ -1,5 +1,11 @@
 """Run the app's offline tests from inside this directory."""
 
+# READER GUIDE
+# Offline test entry point, runnable from inside coach.
+# The two suites exercise chat contracts/workflow and the index handoff guards.
+# These checks do not establish answer quality across the corpus and do not
+# submit live model requests. Live checks are separate, explicitly named scripts.
+
 import sys
 import unittest
 from pathlib import Path

@@ -1,5 +1,16 @@
 """Build overlapping embedding windows while retaining canonical evidence spans."""
 
+# READER GUIDE
+# Turn source objects into embedding inputs without losing citation links.
+# Objects are logical content units; windows are token-limited slices that the
+# embedding model can accept. Several windows may point to the same canonical ID.
+# Each window repeats a section/procedure prefix, then contains a slice of body
+# tokens. The prefix uses at most 160 tokens; the entire input stays within 512;
+# neighboring body slices overlap by 48 tokens to soften boundary losses.
+# Evidence spans record start/end offsets relative to original source units,
+# excluding prefix tokens. Retrieval uses these offsets to recover source text
+# and recognize when only part of a procedure or paragraph was actually retrieved.
+
 from ..retrieval.vector import ancestors, units
 
 
@@ -48,6 +59,9 @@ def passages(objects, tokenizer):
             if length > 512:
                 raise ValueError(f'Window overflow: {o["id"]} {length}')
             # Store offsets relative to each original unit so retrieval can distinguish partial from complete evidence.
+            # Example: a 100-token source unit intersecting this window at tokens
+            # 40..80 records start=40, end=80, total=100. Finding that window alone
+            # does not mean the whole unit was retrieved.
             evidence = [
                 dict(
                     id=s["id"],

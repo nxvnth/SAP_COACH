@@ -1,5 +1,16 @@
 """Grounded response and semantic diagram contracts, independent of renderer."""
 
+# READER GUIDE
+# Data contracts and the final boundary before model text reaches the UI.
+# Pydantic checks field names, types and size limits. Additional checks verify
+# that cited IDs are in this request's evidence and diagram endpoints exist.
+# A canonical source ID identifies an ingested object; a node/edge ID identifies
+# an element within a generated diagram. They are not interchangeable.
+# normalize_answer can salvage cited text when optional parts are unusable:
+# uncited paragraphs are omitted with a notice; invalid diagrams are omitted.
+# It does not invent a citation, prove factual entailment, or silently accept an
+# unknown source ID. Read validate_answer first, then normalize_answer.
+
 import re
 from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
@@ -77,11 +88,16 @@ def validate_answer(raw, evidence):
 
 def normalize_answer(raw, evidence):
     """Validate text first. A broken optional diagram must not discard a valid answer."""
+    # Temporarily exclude the optional diagram from the first validation pass.
+    # A malformed arrow or missing node must not prevent checking useful prose.
     text_only = dict(raw, diagram=None)
     # A model may put an evidence-gap explanation in an uncited paragraph.
     # We cannot reliably distinguish that from an uncited factual claim by wording.
     # Preserve only cited paragraphs, disclose the omission, and never invent citations.
     candidate = Answer.model_validate(text_only)
+    # Unknown IDs remain fatal even if another paragraph could be shown.
+    # An empty citation list is different: that paragraph can be omitted, but
+    # only if at least one cited paragraph survives in a grounded/partial answer.
     for block in candidate.blocks:
         if not set(block.source_ids) <= set(evidence):
             raise ValueError("Unknown citation")

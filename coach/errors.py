@@ -1,5 +1,13 @@
 """Safe, actionable errors for the learner; never include provider payloads."""
 
+# READER GUIDE
+# Separate operational failures from the learner's explanation.
+# CoachError carries a machine-readable code, a safe message and an HTTP status.
+# provider_error maps the client's known message patterns into those categories.
+# server.py logs a short incident reference and returns the safe details to React.
+# When adding a provider failure mode, update this mapping rather than exposing
+# a raw response body, which may contain credentials or supplied document text.
+
 
 # Carry a stable error code, safe display message and HTTP status across the service/server boundary.
 class CoachError(Exception):

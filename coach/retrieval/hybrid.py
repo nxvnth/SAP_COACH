@@ -2,6 +2,18 @@
 No question labels are visible to the search or context-building methods.
 """
 
+# READER GUIDE
+# Local candidate search and source assembly; not answer generation.
+# The index has embedding windows linked to canonical content objects. Vector
+# search finds semantic similarity, BM25 finds lexical overlap, and structured
+# search finds exact keys/IDs or overlapping procedure titles. fuse() combines
+# channel ranks into one candidate pool. The app reranks that pool elsewhere.
+# Useful names: by maps object IDs to objects; rows are embedding windows;
+# byanchor groups windows for an object; original maps windows to source excerpts;
+# owners maps source objects to their containing procedures.
+# context() decides which original excerpts fit. It can expand a retrieved step
+# into a procedure, but it does not traverse a domain knowledge graph.
+
 from __future__ import annotations
 import collections, concurrent.futures, math, re, time
 from pathlib import Path
@@ -54,6 +66,8 @@ class BM25:
         self.docs = [collections.Counter(tokens(d)) for d in docs]
         self.length = np.array([sum(d.values()) for d in self.docs])
         self.avg = float(self.length.mean()) or 1
+        # df counts how many passage windows contain a term, not its total occurrences.
+        # A term occurring ten times in one window still contributes one to df.
         self.df = collections.Counter(t for d in self.docs for t in d)
 
     def score(self, query):
@@ -69,6 +83,10 @@ class BM25:
             # k controls how quickly repeated occurrences stop adding value; b controls length normalization.
             k = POLICY["bm25_k1"]
             b = POLICY["bm25_b"]
+            # BM25 adds one contribution per query term to every passage score.
+            # For an average-length passage, length/avg is 1; repeated matches then
+            # saturate through tf/(tf+k). Longer passages receive a larger denominator.
+            # This keeps long passages from winning merely because they contain more words.
             scores += (
                 idf * tf * (k + 1) / (tf + k * (1 - b + b * self.length / self.avg))
             )
@@ -89,6 +107,9 @@ def fuse(channels):
                 oid, dict(canonical_id=oid, score=0.0, channels={}, representative=hit)
             )
             # Each channel votes by rank; rrf_k smooths the advantage of being first.
+            # Example with rrf_k=60: rank 1 contributes 1/61, rank 5 contributes 1/65.
+            # An object appearing in two channels receives both votes. A large raw
+            # BM25 score cannot overwhelm vector search because only ranks are added.
             contribution = 1 / (POLICY["rrf_k"] + rank)
             m["score"] += contribution
             m["channels"][name] = dict(
@@ -168,6 +189,8 @@ class Hybrid:
         for proc in self.procedures:
             for oid, _ in vector.units(proc, self.by):
                 self.owners[oid].append(proc["id"])
+        # The worker pool overlaps independent searches within one question.
+        # It does not make the HTTP app a multi-user concurrent generation service.
         self.pool = concurrent.futures.ThreadPoolExecutor(max_workers=3)
 
     def close(self):

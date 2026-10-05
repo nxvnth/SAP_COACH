@@ -1,5 +1,12 @@
 """From coach/: ../.venv/bin/python ingest.py --help."""
 
+# READER GUIDE
+# Command-line adapter for the offline ingestion package.
+# extract reads a list of document ranges from JSON and creates a new candidate.
+# build reads a previously extracted candidate and creates its vector index.
+# The CLI has no automatic activation step. See README.md for how to review a
+# candidate and select it with SAP_COACH_INDEX when starting the chatbot.
+
 import argparse
 import json
 import sys
